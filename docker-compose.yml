@@ -1,15 +1,14 @@
 version: '3'
 services:
   api:
+    container_name: api
     environment:
-      PYTHONUNBUFFERED: 1
+      FLASK_ENV: development
+      FLASK_DEBUG: 1
     build: .
     ports:
       - "5000:5000"
     volumes:
       - .:/app
-    depends_on:
-      - redis
-
-  redis:
-    image: redis
+    stdin_open: true
+    tty: true

@@ -7,5 +7,4 @@ RUN pip install -r requirements.txt
 COPY . /app
 WORKDIR /app/src
 
-ENTRYPOINT [ "python" ]
-CMD [ "microblog.py" ]
+CMD [ "python", "microblog.py" ]
