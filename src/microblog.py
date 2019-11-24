@@ -1,10 +1,10 @@
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, json
 from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 
 class ServerError(HTTPException):
-    code = 427
+    code = 400
     description = 'you fucked up'
 
 @app.route('/login', methods=['POST'])
@@ -18,10 +18,15 @@ def login():
 
 @app.errorhandler(HTTPException)
 def error_handling(error):
-    print(error.description)
-    return jsonify({
-        'message': error.description
-    }), error.code
+    response = error.get_response()
+    response.data = json.dumps({
+        'code': error.code,
+        'name': error.name,
+        'type': type(error).__name__,
+        'description': error.description
+    })
+    response.content_type = 'application/json'
+    return response
 
 
 if __name__ == '__main__':
