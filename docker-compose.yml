@@ -2,9 +2,6 @@ version: '3'
 services:
   api:
     container_name: api
-    environment:
-      FLASK_ENV: development
-      FLASK_DEBUG: 1
     build: .
     ports:
       - "5000:5000"
