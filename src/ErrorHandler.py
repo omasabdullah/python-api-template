@@ -1,32 +1,31 @@
 import json
-import werkzeug.exceptions
+from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException
 from enum import Enum
 
 class ErrorType(Enum):
-    # 400 Errors
-    generic = werkzeug.exceptions.BadRequest
-    unauthorized = werkzeug.exceptions.Unauthorized
-    forbidden = werkzeug.exceptions.Forbidden
-    not_found = werkzeug.exceptions.NotFound
-    too_many_requests = werkzeug.exceptions.TooManyRequests
+    generic = 400
+    unauthorized = 401
+    forbidden = 403
+    not_found = 404
+    too_many_requests = 429
 
-    # 500 Errors
-    internal = werkzeug.exceptions.InternalServerError
-    not_implemented = werkzeug.exceptions.NotImplemented
+    internal = 500
+    not_implemented = 501
 
 
-def Error(error_type: ErrorType, message: str) -> werkzeug.exceptions.HTTPException:
+def Error(error_type: ErrorType, detail: str) -> HTTPException:
     if type(error_type) is not ErrorType:
         raise Exception('Somethings wrong')
-    return error_type.value(message)
+    return HTTPException(status_code=error_type.value, detail=detail)
 
 # Error handler
-def error_handler(error):
-    response = error.get_response()
-    response.data = json.dumps({
-        'code': error.code,
-        'name': error.name,
-        'description': error.description
-    })
-    response.content_type = 'application/json'
-    return response
+def http_exception(request, error):
+    return JSONResponse({
+        'code': error.status_code,
+        'name': error.detail
+    }, status_code=error.status_code)
+
+exception_handlers = {
+    HTTPException: http_exception
+}
