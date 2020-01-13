@@ -1,7 +1,7 @@
-Flask API Template
+Python API Template
 ===
 
-Use this template as a way of creating your own Flask APIs
+Use this template as a way of creating your own Python API
 
 ### Prerequisites
 1. This uses docker-compose to run the API

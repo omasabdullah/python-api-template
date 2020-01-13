@@ -34,5 +34,4 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         }
 
         logging.info(log_params)
-        # import pdb; pdb.set_trace()
         return response
