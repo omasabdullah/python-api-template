@@ -1,33 +1,31 @@
 import logging
-from flask import Flask
+import uvicorn
 
+from starlette.applications import Starlette
+from starlette.responses import JSONResponse
+from starlette.middleware import Middleware
+
+from src.Logging import LoggingMiddleware
+from src.ErrorHandler import exception_handlers
 from src.routes.v1 import v1
 
-from werkzeug.exceptions import HTTPException
-from src.ErrorHandler import error_handler
-from src.Logging import setup_json_logging
 
-import config
+routes = [
+    v1
+]
 
+middleware = [
+    Middleware(LoggingMiddleware)
+]
 
-def create_app(config):
-    # Create application and setup config
-    app = Flask(__name__)
-    app.config.from_object(config)
-
-    # Add routes for users
-    app.register_blueprint(v1, url_prefix=f'/api/{v1.name}')
-
-    # Add generic error handling
-    app.register_error_handler(HTTPException, error_handler)
-
-    # Setting up custom logs
-    setup_json_logging(app)
-
-    return app
+app = Starlette(
+    debug=True,
+    routes=routes,
+    exception_handlers=exception_handlers,
+    middleware=middleware
+)
 
 
 # Start server
 if __name__ == '__main__':
-    app = create_app(config.DevelopmentConfig)
-    app.run(host='0.0.0.0')
+    uvicorn.run('app:app', host='0.0.0.0', port=8000, log_level='info', reload=True)

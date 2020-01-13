@@ -1,5 +1,5 @@
-from flask import jsonify
+from starlette.responses import JSONResponse
 
 
-def show():
-    return jsonify({}), 200
+async def show(request):
+    return JSONResponse({})

@@ -1,48 +1,38 @@
-import json
 import time
 import logging
+
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from datetime import datetime
 
 from rfc3339 import rfc3339
 
-from flask import request, current_app
 
-log = logging.getLogger('werkzeug')
-log.disabled = True
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
 
-def setup_json_logging(flask_app):
-    handler = flask_app.logger.handlers[0]
-    handler.setFormatter(logging.Formatter('%(message)s'))
-    flask_app.before_request_funcs.setdefault(None, []).append(before_log_request)
-    flask_app.after_request_funcs.setdefault(None, []).append(after_log_request)
+        end_time = time.time()
+        duration = round((end_time - start_time) * 1000, 2)
+        dt = datetime.fromtimestamp(end_time)
+        timestamp = rfc3339(dt, utc=True)
 
+        path_split = request.scope['path'].split('/')[1:]
+        version = path_split[1] if len(path_split) > 2 else None
 
-def before_log_request():
-    request.start_time = time.time()
+        log_params = {
+            'method': request.method,
+            'path': request.scope['path'],
+            'status': response.status_code,
+            'duration': duration,
+            'timestamp': timestamp,
+            'version': version,
+            'ip': request.client.host,
+            'host': request.scope['server'][0],
+            'params': str(request.query_params)
+        }
 
-
-def after_log_request(response):
-    now = time.time()
-    duration = round((now - request.start_time) * 1000, 2)
-    dt = datetime.fromtimestamp(now)
-    timestamp = rfc3339(dt, utc=True)
-
-    path_split = request.path.split('/')[1:]
-    version = path_split[1] if len(path_split) > 2 else None
-
-    log_params = {
-        'method': request.method,
-        'path': request.path,
-        'status': response.status_code,
-        'duration': duration,
-        'timestamp': timestamp,
-        'version': version,
-        'ip': request.remote_addr,
-        'host': request.host,
-        'params': request.args,
-    }
-
-    current_app.logger.info(json.dumps(log_params))
-
-    return response
+        logging.info(log_params)
+        # import pdb; pdb.set_trace()
+        return response
