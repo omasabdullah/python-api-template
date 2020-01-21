@@ -5,8 +5,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from datetime import datetime
 
-from rfc3339 import rfc3339
-
 
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
@@ -15,8 +13,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
         end_time = time.time()
         duration = round((end_time - start_time) * 1000, 2)
+        # RFC 3339
         dt = datetime.fromtimestamp(end_time)
-        timestamp = rfc3339(dt, utc=True)
+        timestamp = dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
         path_split = request.scope['path'].split('/')[1:]
         version = path_split[1] if len(path_split) > 2 else None
