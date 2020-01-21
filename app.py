@@ -8,10 +8,12 @@ from starlette.middleware import Middleware
 from src.Logging import LoggingMiddleware
 from src.ErrorHandler import exception_handlers
 from src.routes.v1 import v1
+from src.routes.graphql import graphql_route
 
 
 routes = [
-    v1
+    v1,
+    graphql_route
 ]
 
 middleware = [
