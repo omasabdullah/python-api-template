@@ -6,6 +6,6 @@ routes = []
 
 routes.append(Route('/health', endpoint=HealthController))
 routes.append(Route('/users', endpoint=UsersController))
-routes.append(Route('/users/{user_id:int}', endpoint=UserController))
+routes.append(Route('/users/{user_id:str}', endpoint=UserController))
 
 v1 = Mount('/api/v1', routes=[r for r in routes])

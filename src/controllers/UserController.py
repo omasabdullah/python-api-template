@@ -1,20 +1,24 @@
+from bson.objectid import ObjectId
+
 from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
 
 from src.ErrorHandler import Error, ErrorType
-from src.database.database import users
+from src.database.database import users_collection
+
+from src.models.User import User
 
 
 class UsersController(HTTPEndpoint):
     async def get(self, request):
+        users = await get_users()
         return JSONResponse(users)
 
     async def post(self, request):
         new_user = await request.json()
-
         if new_user:
-            users.append(new_user)
-            return JSONResponse(content=new_user, status_code=201)
+            users_collection.insert_one(new_user)
+            return JSONResponse(content={}, status_code=201)
         else:
             raise Error(ErrorType.generic, 'Error creating user')
 
@@ -22,7 +26,6 @@ class UsersController(HTTPEndpoint):
 class UserController(HTTPEndpoint):
     async def get(self, request):
         id = request.path_params['user_id']
-
         user = await get_user(id)
 
         if user:
@@ -43,9 +46,8 @@ class UserController(HTTPEndpoint):
 
 
 async def get_user(id):
-    return next(
-        filter(
-            lambda x: x.get('id') == id,
-            users
-        ),
-    None)
+    user = users_collection.find_one({'_id': ObjectId(id)})
+    return User(**user).serialize() if user else None
+
+async def get_users():
+    return [User(**x).serialize() for x in users_collection.find()]
