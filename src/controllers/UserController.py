@@ -46,7 +46,7 @@ class UserController(HTTPEndpoint):
 
 
 async def get_user(id):
-    user = users_collection.find_one({'_id': ObjectId(id)})
+    user = users_collection.find_one({'_id': id})
     return User(**user).serialize() if user else None
 
 async def get_users():

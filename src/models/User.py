@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
+from .BaseObject import BaseObject
+
 @dataclass
-class User():
-    _id: str
+class User(BaseObject):
     name: str
     price: int
 
     def serialize(self):
         return {
-            'id': str(self._id),
             'name': self.name,
             'price': self.price,
         }
