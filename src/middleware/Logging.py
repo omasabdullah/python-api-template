@@ -1,9 +1,8 @@
 import time
 import logging
+import datetime
 
 from starlette.middleware.base import BaseHTTPMiddleware
-
-from datetime import datetime
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
@@ -14,7 +13,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         end_time = time.time()
         duration = round((end_time - start_time) * 1000, 2)
         # RFC 3339
-        dt = datetime.fromtimestamp(end_time)
+        dt = datetime.datetime.fromtimestamp(end_time)
         timestamp = dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
         path_split = request.scope['path'].split('/')[1:]

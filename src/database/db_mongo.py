@@ -9,5 +9,4 @@ client = MongoClient(
 )
 
 users_db = client.users
-
 users_collection = users_db.users

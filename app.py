@@ -5,10 +5,14 @@ from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from starlette.middleware import Middleware
 
-from src.Logging import LoggingMiddleware
+from src.middleware.Logging import LoggingMiddleware
 from src.ErrorHandler import exception_handlers
 from src.routes.v1 import v1
 from src.routes.graphql import graphql_route
+
+from src.middleware.Authentication import AuthMiddleware
+from starlette.middleware.authentication import AuthenticationMiddleware
+
 
 
 routes = [
@@ -17,7 +21,8 @@ routes = [
 ]
 
 middleware = [
-    Middleware(LoggingMiddleware)
+    Middleware(LoggingMiddleware),
+    Middleware(AuthenticationMiddleware, backend=AuthMiddleware())
 ]
 
 app = Starlette(

@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
 
 from src.ErrorHandler import Error, ErrorType
-from src.database.database import users_collection
+from src.database.db_mongo import users_collection
 
 from src.models.User import User
 
@@ -49,5 +49,5 @@ async def get_user(id):
     user = users_collection.find_one({'_id': id})
     return User(**user).serialize() if user else None
 
-async def get_users():
-    return [User(**x).serialize() for x in users_collection.find()]
+async def get_users(filter: dict = {}):
+    return [User(**x).serialize() for x in users_collection.find(filter)]

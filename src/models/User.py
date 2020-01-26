@@ -1,14 +1,24 @@
 from dataclasses import dataclass
 
 from .BaseObject import BaseObject
+from starlette.authentication import BaseUser
 
 @dataclass
-class User(BaseObject):
-    name: str
-    price: int
+class User(BaseObject, BaseUser):
+    username: str
+    email: str
+    password: str
 
     def serialize(self):
         return {
-            'name': self.name,
-            'price': self.price,
+            'username': self.username,
+            'email': self.email,
         }
+
+    @property
+    def is_authenticated(self) -> bool:
+        return True
+
+    @property
+    def display_name(self) -> str:
+        return self.username
