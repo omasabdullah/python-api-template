@@ -11,6 +11,9 @@ from src.models.User import User
 
 class UsersController(HTTPEndpoint):
     async def get(self, request):
+        if not request.user.is_authenticated:
+            raise Error(ErrorType.unauthorized, 'Unauthorized')
+
         users = await get_users()
         return JSONResponse([u.serialized for u in users])
 

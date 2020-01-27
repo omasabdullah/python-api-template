@@ -59,18 +59,9 @@ async def login(request):
     if not all([email, password]):
         raise Error(ErrorType.unauthorized, strings.LOGIN_FAILED)
 
-    # Find user with email
-    filter = {'email': email}
-    users = await get_users(filter=filter)
-
-    if len(users) != 1:
-        raise Error(ErrorType.unauthorized, strings.LOGIN_FAILED)
-
-    user = users[0]
-    if not await verify_password(
-        plain_password=password,
-        salt=user.salt,
-        hashed_password=user.password
+    if not await authenticate_user(
+        email=email,
+        password=password
     ):
        raise Error(ErrorType.unauthorized, strings.LOGIN_FAILED)
 
@@ -80,6 +71,21 @@ async def login(request):
 async def logout(request):
     return JSONResponse()
 
+
+async def authenticate_user(email: str, password: str) -> bool:
+    filter = {'email': email}
+    users = await get_users(filter=filter)
+
+    if len(users) != 1:
+        return False
+
+    user = users[0]
+
+    return await verify_password(
+        plain_password=password,
+        salt=user.salt,
+        hashed_password=user.password
+    )
 
 async def hash_password(plain_password) -> (str, bytes):
     salt = os.urandom(32)
