@@ -8,6 +8,7 @@ class User(BaseObject, BaseUser):
     username: str
     email: str
     password: str
+    salt: str
 
     def serialize(self):
         return {

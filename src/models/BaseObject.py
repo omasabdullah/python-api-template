@@ -5,7 +5,12 @@ from bson.objectid import ObjectId
 class BaseObject():
     _id: ObjectId
 
-    def serialize(self):
+    @property
+    def serialized(self) -> dict:
         return {
-            'id': str(self._id)
+            'id': str(self._id),
+            **self.serialize()
         }
+
+    def serialize(self) -> dict:
+        raise NotImplementedError()

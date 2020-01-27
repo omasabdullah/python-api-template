@@ -12,16 +12,7 @@ from src.models.User import User
 class UsersController(HTTPEndpoint):
     async def get(self, request):
         users = await get_users()
-        return JSONResponse(users)
-
-    async def post(self, request):
-        new_user = await request.json()
-        if new_user:
-            users_collection.insert_one(new_user)
-            return JSONResponse(content={}, status_code=201)
-        else:
-            raise Error(ErrorType.generic, 'Error creating user')
-
+        return JSONResponse([u.serialized for u in users])
 
 class UserController(HTTPEndpoint):
     async def get(self, request):
@@ -29,7 +20,7 @@ class UserController(HTTPEndpoint):
         user = await get_user(id)
 
         if user:
-            return JSONResponse(user)
+            return JSONResponse(user.serialized)
         else:
             raise Error(ErrorType.not_found, 'User not found')
 
@@ -45,9 +36,10 @@ class UserController(HTTPEndpoint):
             raise Error(ErrorType.generic, 'Error updating user')
 
 
-async def get_user(id):
+async def get_user(id) -> User:
     user = users_collection.find_one({'_id': id})
-    return User(**user).serialize() if user else None
+    return User(**user) if user else None
+
 
 async def get_users(filter: dict = {}):
-    return [User(**x).serialize() for x in users_collection.find(filter)]
+    return [User(**x) for x in users_collection.find(filter)]

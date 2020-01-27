@@ -23,7 +23,7 @@ def Error(error_type: ErrorType, detail: str) -> HTTPException:
 def http_exception(request, error):
     return JSONResponse({
         'code': error.status_code,
-        'name': error.detail
+        'error': error.detail
     }, status_code=error.status_code)
 
 exception_handlers = {
