@@ -1,5 +1,6 @@
 import base64
 import binascii
+import jwt
 
 from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
@@ -33,5 +34,24 @@ class BasicAuthMiddleware(AuthenticationBackend):
                 password=password
             ):
                 return AuthCredentials(['authenticated']), SimpleUser(username)
+
+        return AuthCredentials(), UnauthenticatedUser()
+
+
+class JWTAuthMiddleware(AuthenticationBackend):
+    async def authenticate(self, request):
+        if 'Authorization' not in request.headers:
+            return
+
+        auth = request.headers['Authorization']
+        scheme, credentials = auth.split()
+
+        if scheme.lower() == 'bearer':
+            try:
+                payload = jwt.decode(credentials, 'secret', algorithms=['HS256'])
+            except jwt.InvalidTokenError as e:
+                raise AuthenticationError('Invalid JWT')
+
+            return AuthCredentials(['authenticated']), SimpleUser('omas')
 
         return AuthCredentials(), UnauthenticatedUser()

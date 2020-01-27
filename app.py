@@ -10,7 +10,7 @@ from src.ErrorHandler import exception_handlers
 from src.routes.v1 import v1
 from src.routes.graphql import graphql_route
 
-from src.middleware.Authentication import BasicAuthMiddleware
+from src.middleware.Authentication import BasicAuthMiddleware, JWTAuthMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 
 
@@ -22,7 +22,7 @@ routes = [
 
 middleware = [
     Middleware(LoggingMiddleware),
-    Middleware(AuthenticationMiddleware, backend=BasicAuthMiddleware())
+    Middleware(AuthenticationMiddleware, backend=JWTAuthMiddleware())
 ]
 
 app = Starlette(
