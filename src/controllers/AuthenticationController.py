@@ -1,12 +1,15 @@
 import hashlib
 import os
 import hmac
+import jwt
+
+from datetime import datetime, timedelta
 
 from starlette.responses import JSONResponse
 
 from src.ErrorHandler import Error, ErrorType
 from src.database.db_mongo import users_collection
-from src import strings
+from src import strings, settings
 from src.controllers.UserController import get_users
 from src.models.User import User
 
@@ -111,3 +114,16 @@ async def verify_password(plain_password, salt, hashed_password) -> bool:
         ),
         hashed_password
     )
+
+async def create_jwt_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+
+    to_encode.update({'exp': expire})
+    encoded_jwt = jwt.encode(to_encode, str(settings.JWT_PRIVATE_KEY), algorithm='RS256')
+
+    return encoded_jwt

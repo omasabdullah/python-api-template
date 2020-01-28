@@ -23,3 +23,7 @@ class User(BaseObject, BaseUser):
     @property
     def display_name(self) -> str:
         return self.username
+
+    @property
+    def identity(self) -> str:
+        return str(self._id)

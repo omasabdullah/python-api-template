@@ -7,6 +7,8 @@ from starlette.endpoints import HTTPEndpoint
 
 from src.ErrorHandler import Error, ErrorType
 from src.controllers.AuthenticationController import authenticate_user
+from src.controllers.UserController import get_user
+from src import settings
 
 from src.models.User import User
 
@@ -48,10 +50,13 @@ class JWTAuthMiddleware(AuthenticationBackend):
 
         if scheme.lower() == 'bearer':
             try:
-                payload = jwt.decode(credentials, 'secret', algorithms=['HS256'])
+                payload = jwt.decode(credentials, str(settings.JWT_PUBLIC_KEY), algorithms=['RS256'])
             except jwt.InvalidTokenError as e:
                 raise AuthenticationError('Invalid JWT')
 
-            return AuthCredentials(['authenticated']), SimpleUser('omas')
+            user_id = payload.get('id')
+            user = await get_user(user_id)
+
+            return AuthCredentials(payload.get('scopes', [])), user
 
         return AuthCredentials(), UnauthenticatedUser()
