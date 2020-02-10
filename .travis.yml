@@ -7,6 +7,8 @@ before_install:
     - docker-compose build
     - docker-compose up -d
 
+install: skip
+
 script:
     - docker ps
     - docker exec -it api pytest

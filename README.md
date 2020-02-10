@@ -1,5 +1,6 @@
 Python API Template
 ===
+[![Build Status](https://travis-ci.com/paytheo/python-api-template.svg?branch=master)](https://travis-ci.com/paytheo/python-api-template)
 
 Use this template as a way of creating your own Python API
 
