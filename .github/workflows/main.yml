@@ -1,0 +1,16 @@
+name: Docker CI
+
+on: [push]
+
+jobs:
+  build:
+  runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the docker container
+        run: docker-compose build
+      - name: Run the docker container
+        run: docker-compose up -d
+      - name: Run tests
+        run: docker exec -it api pytest
