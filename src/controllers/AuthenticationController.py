@@ -28,13 +28,16 @@ async def register(request):
         raise Error(ErrorType.generic, strings.INVALID_PAYLOAD)
 
     # Verify that an account with the specified email does not already exist
-    filter = {'email': email}
-    users = await get_users(filter=filter)
+    users = await get_users(
+        filter=
+        {
+            'email': email
+        }
+    )
 
     if len(users) > 0:
         raise Error(ErrorType.generic, strings.ACCOUNT_CREATE_EXISTS)
 
-    # Hash + Salt using pbkdf2_hmac, a slower hashing method to increase difficulty of brute forcing
     hashed_password, salt = await hash_password(
         plain_password=password
     )
@@ -67,6 +70,7 @@ async def login(request):
         password=password
     ):
        raise Error(ErrorType.unauthorized, strings.LOGIN_FAILED)
+
 
     return JSONResponse({})
 
@@ -124,6 +128,6 @@ async def create_jwt_token(data: dict, expires_delta: timedelta = None):
         expire = datetime.utcnow() + timedelta(minutes=15)
 
     to_encode.update({'exp': expire})
-    encoded_jwt = jwt.encode(to_encode, str(settings.JWT_PRIVATE_KEY), algorithm='RS256')
+    encoded_jwt = jwt.encode(to_encode, str(settings.AUTH_KEY), algorithm=settings.AUTH_METHOD)
 
     return encoded_jwt

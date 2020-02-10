@@ -11,5 +11,5 @@ DB_PORT = config('DB_PORT', cast=int, default='27017')
 DB_USERNAME = config('DB_USERNAME', cast=Secret)
 DB_PASSWORD = config('DB_PASSWORD', cast=Secret)
 
-JWT_PUBLIC_KEY = config('JWT_PUBLIC_KEY', cast=Secret)
-JWT_PRIVATE_KEY = config('JWT_PRIVATE_KEY', cast=Secret)
+AUTH_METHOD = config('AUTH_ALGORITHM', cast=str, default='HS256')
+AUTH_KEY = config('AUTH_KEY', cast=Secret)

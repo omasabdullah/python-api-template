@@ -2,17 +2,18 @@ version: '3'
 services:
   api:
     container_name: api
-    build: .
+    build: src/.
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - src/.:/app
     environment:
       DEBUG: 1
       DB_HOST: db
       DB_PORT: 27017
       DB_USERNAME: root
       DB_PASSWORD: password
+      AUTH_KEY: testing_secret
     stdin_open: true
     tty: true
   db:

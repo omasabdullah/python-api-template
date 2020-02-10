@@ -1,6 +1,8 @@
 import json
 from starlette.responses import JSONResponse
 from starlette.exceptions import HTTPException
+from starlette.authentication import AuthenticationError
+
 from enum import Enum
 
 class ErrorType(Enum):
@@ -17,6 +19,7 @@ class ErrorType(Enum):
 def Error(error_type: ErrorType, detail: str) -> HTTPException:
     if type(error_type) is not ErrorType:
         raise Exception('Somethings wrong')
+
     return HTTPException(status_code=error_type.value, detail=detail)
 
 # Error handler
@@ -27,5 +30,6 @@ def http_exception(request, error):
     }, status_code=error.status_code)
 
 exception_handlers = {
-    HTTPException: http_exception
+    HTTPException: http_exception,
+    AuthenticationError: http_exception,
 }
