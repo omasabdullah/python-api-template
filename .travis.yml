@@ -9,3 +9,4 @@ before_install:
 
 script:
     - docker ps
+    - docker exec -it api pytest
