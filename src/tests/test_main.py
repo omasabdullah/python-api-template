@@ -1,41 +1,14 @@
-from starlette.testclient import TestClient
-from starlette.responses import JSONResponse
-from starlette.applications import Starlette
-from starlette.middleware import Middleware
+import pytest
 
-from src.ErrorHandler import exception_handlers
 from src.routes.v1 import v1
 
-from src import settings
-
-from src.middleware.Authentication import JWTAuthMiddleware
-from starlette.middleware.authentication import AuthenticationMiddleware
-
-routes = [
-    v1
-]
-
-middleware = [
-     Middleware(AuthenticationMiddleware, backend=JWTAuthMiddleware())
-]
-
-app = Starlette(
-    debug=settings.DEBUG,
-    routes=routes,
-    exception_handlers=exception_handlers,
-    middleware=middleware
-)
-
-client = TestClient(app)
-
-
-def test_health():
+def test_health(client):
     response = client.get(v1.path + '/health')
     assert response.status_code == 200
     assert response.json() == {}
 
 
-def test_get_users_unauthorized():
+def test_get_users_unauthorized(client):
     response = client.get(v1.path + '/users')
 
     payload = {
@@ -45,3 +18,24 @@ def test_get_users_unauthorized():
 
     assert response.status_code == 403
     assert response.json() == payload
+
+
+def test_register_no_payload(client):
+    response = client.post(v1.path + '/register')
+
+    assert response.status_code == 400
+
+required_fields = {
+    'email': 'test@gmail.com',
+    'username': 'test_user',
+    'password': 'test_password',
+}
+
+bad_payloads = [(required_fields) for x in required_fields.keys()]
+
+@pytest.mark.parametrize('json', bad_payloads)
+def test_register_bad_payload(client, json):
+    print(json)
+    #response = client.post(v1.path + '/register', json=json)
+
+    #assert response.status_code == 400
