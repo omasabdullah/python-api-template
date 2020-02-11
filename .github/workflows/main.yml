@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+    - uses: actions/checkout@v2
     - name: Run docker container
       run: docker-compose up -d
     - name: Run tests
