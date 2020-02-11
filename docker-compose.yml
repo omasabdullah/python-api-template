@@ -2,11 +2,11 @@ version: '3'
 services:
   api:
     container_name: api
-    build: src/.
+    build: .
     ports:
       - "8000:8000"
     volumes:
-      - src/.:/app
+      - .:/app
     environment:
       DEBUG: 1
       DB_HOST: db
